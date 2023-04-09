@@ -5,17 +5,12 @@ from src.enum.preprocessing_stage import PreprocessingStage
 from src.service.preprocessor.image_enhancer import ImageEnhancer
 from src.service.preprocessor.image_filterer import ImageFilterer
 from src.service.preprocessor.image_segmentor import ImageSegmentor
+from src.service.preprocessor.preprocessing_utils import PreprocessingUtils
 from src.util.file_system_utils import FileSystemUtils
 
 app = Flask(__name__)
 
 app.config['UPLOAD_FOLDER'] = AppConstants.temp_file_upload_directory
-
-preprocessor_from_stage_name: dict = {
-    PreprocessingStage.enhancement.name: ImageEnhancer(),
-    PreprocessingStage.filtration.name: ImageFilterer(),
-    PreprocessingStage.segmentation.name: ImageSegmentor()
-}
 
 
 @app.route('/hello', methods=['GET'])
@@ -23,11 +18,11 @@ def hello_world():
     return 'Hello, World!'
 
 
-@app.route('/api/preprocess/<preprocessor>', methods=['POST'])
-def preprocess_image(preprocessor):
-    assert preprocessor == request.view_args['preprocessor']
-    assert PreprocessingStage.is_valid_name(preprocessor), "Invalid Preprocessor"
-    preprocessor = preprocessor_from_stage_name.get(preprocessor)
+@app.route('/api/preprocess/<preprocessing_stage>', methods=['POST'])
+def preprocess_image(preprocessing_stage):
+    assert preprocessing_stage == request.view_args['preprocessing_stage']
+    assert PreprocessingStage.is_valid_name(preprocessing_stage), "Invalid Preprocessor"
+    preprocessor = PreprocessingUtils.get_preprocessor_from_stage_name(preprocessing_stage)
     file = request.files['file']
     input_file_saved_path = FileSystemUtils.save_temp_file(file)
     preprocessed_file_save_path = FileSystemUtils.join(AppConstants.temp_preprocessed_file_save_directory,
