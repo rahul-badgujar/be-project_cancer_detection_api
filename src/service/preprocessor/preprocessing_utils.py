@@ -21,9 +21,8 @@ class PreprocessingUtils:
         return PreprocessingUtils.preprocessor_from_stage_name.get(stage_name)
 
     @staticmethod
-    def apply_all_preprocessors(img_path: str) -> str:
-        enhanced_img_path = PreprocessingUtils.image_enhancer.process(img_path)
-        filtered_img_path = PreprocessingUtils.image_filterer.process(enhanced_img_path)
-        segmented_img_path = PreprocessingUtils.image_segmentor.process(filtered_img_path)
-
-        return segmented_img_path
+    def apply_all_preprocessors(img_array) -> str:
+        enhanced = PreprocessingUtils.image_enhancer.process(img_array)
+        filtered = PreprocessingUtils.image_filterer.process(enhanced)
+        segmented = PreprocessingUtils.image_segmentor.process(filtered)
+        return segmented
