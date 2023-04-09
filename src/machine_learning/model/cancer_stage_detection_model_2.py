@@ -12,14 +12,12 @@ from src.util.file_system_utils import FileSystemUtils
 
 class CancerStageDetectionModel:
     preprocess_before_training = False
-
     @staticmethod
-    def get_input_feature(image):
-        image = cv2.imread(image, cv2.IMREAD_GRAYSCALE)
+    def get_input_feature(image_path):
+        image = cv2.imread(image_path)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         image = cv2.resize(image, (200, 200))
-        features1 = quantify_image(image)
-        features2 = fd_hu_moments(image)
-        return np.hstack([features1, features2])
+        return image.flatten()
 
     @staticmethod
     def split_data(dataset_path) -> tuple:
