@@ -43,7 +43,7 @@ class CancerStageDetectionModel:
 
         c = 1.0
         kernel = 'linear'
-        model = svm.SVC(kernel=kernel, C=c)
+        model = svm.SVC(kernel=kernel, C=c, gamma='scale')
 
         model.fit(x_train, y_train)
         predictions = model.predict(x_test)
