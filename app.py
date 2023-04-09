@@ -25,11 +25,8 @@ def preprocess_image(preprocessing_stage):
     preprocessor = PreprocessingUtils.get_preprocessor_from_stage_name(preprocessing_stage)
     file = request.files['file']
     input_file_saved_path = FileSystemUtils.save_temp_file(file)
-    preprocessed_file_save_path = FileSystemUtils.join(AppConstants.temp_preprocessed_file_save_directory,
-                                                       FileSystemUtils.append_filename_with(
-                                                           FileSystemUtils.get_filename(file), f'_{preprocessor}'))
-    preprocessor.process(input_file_saved_path, preprocessed_file_save_path)
-    return send_file(preprocessed_file_save_path)
+    preprocessed_img_path = preprocessor.process(input_file_saved_path)
+    return send_file(preprocessed_img_path)
 
 
 if __name__ == '__main__':

@@ -3,7 +3,6 @@ from src.service.preprocessor.image_enhancer import ImageEnhancer
 from src.service.preprocessor.image_filterer import ImageFilterer
 from src.service.preprocessor.image_segmentor import ImageSegmentor
 from src.service.preprocessor.preprocessor_base import Preprocessor
-from src.util.file_system_utils import FileSystemUtils
 
 
 class PreprocessingUtils:
@@ -23,13 +22,8 @@ class PreprocessingUtils:
 
     @staticmethod
     def apply_all_preprocessors(img_path: str) -> str:
-        enhanced_img_path = FileSystemUtils.append_filename_with(img_path, f'_{PreprocessingStage.enhancement.name}')
-        PreprocessingUtils.image_enhancer.process(img_path, enhanced_img_path)
-
-        filtered_img_path = FileSystemUtils.append_filename_with(img_path, f'_{PreprocessingStage.filtration}')
-        PreprocessingUtils.image_filterer.process(enhanced_img_path, filtered_img_path)
-
-        segmented_img_path = FileSystemUtils.append_filename_with(img_path, f'_{PreprocessingStage.segmentation.name}')
-        PreprocessingUtils.image_segmentor.process(filtered_img_path, segmented_img_path)
+        enhanced_img_path = PreprocessingUtils.image_enhancer.process(img_path)
+        filtered_img_path = PreprocessingUtils.image_filterer.process(enhanced_img_path)
+        segmented_img_path = PreprocessingUtils.image_segmentor.process(filtered_img_path)
 
         return segmented_img_path

@@ -14,13 +14,7 @@ class CancerStageDetectionModel:
     @staticmethod
     def get_input_feature(image):
         image = cv2.imread(image, cv2.IMREAD_GRAYSCALE)
-        # image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        # image = cv2.resize(image, (200, 200))
-        # # threshold the image such that the drawing appears as white
-        # # on a black background
-        # image = cv2.threshold(image, 0, 255,
-        #                       cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
-
+        image = cv2.resize(image, (200, 200))
         features1 = quantify_image(image)
         features2 = fd_hu_moments(image)
         return np.hstack([features1, features2])
