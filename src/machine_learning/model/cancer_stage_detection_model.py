@@ -5,6 +5,7 @@ from imutils import paths
 from sklearn.metrics import accuracy_score
 
 from src.constant.app_constants import AppConstants
+from src.constant.cancer_stage import CancerStage
 from src.machine_learning.ml_utils import quantify_image, fd_hu_moments
 from src.service.preprocessor.preprocessing_utils import PreprocessingUtils
 from src.util.file_system_utils import FileSystemUtils
@@ -17,16 +18,20 @@ class CancerStageDetectionModel:
     def get_input_feature(image_path):
         image = cv2.imread(image_path)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        image = cv2.resize(image, (240, 240))
         if CancerStageDetectionModel.preprocess_before_training:
             image = PreprocessingUtils.apply_all_preprocessors(image)
-        return image.flatten()
+        ft1 = quantify_image(image)
+        ft2 = fd_hu_moments(image)
+        return np.hstack([ft1, ft2])
 
     @staticmethod
     def split_data(dataset_path) -> tuple:
         training_images_paths = list(paths.list_images(dataset_path))
         labels = [img_path.split(FileSystemUtils.get_os_path_separator())[-2] for img_path in training_images_paths]
+        labels_encoded = [CancerStage.parse_from_name(label).value for label in labels]
         input_features = [CancerStageDetectionModel.get_input_feature(img) for img in training_images_paths]
-        return np.array(input_features), np.array(labels)
+        return np.array(input_features), np.array(labels_encoded)
 
     @staticmethod
     def train() -> dict:

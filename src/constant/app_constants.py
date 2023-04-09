@@ -3,5 +3,5 @@ class AppConstants:
     temp_file_upload_directory = f'{temp_directory}/uploads'
     temp_intermediate_files_directory = f'{temp_directory}/intermediate'
     # todo: make this path relative
-    training_dataset_directory = '/home/rahul/rahul/be-project/cancer-detection-api/data/training_set'
-    testing_dataset_directory = '/home/rahul/rahul/be-project/cancer-detection-api/data/testing_set'
+    training_dataset_directory = '/home/rahul/rahul/be-project/cancer-detection-api/data/train'
+    testing_dataset_directory = '/home/rahul/rahul/be-project/cancer-detection-api/data/test'
