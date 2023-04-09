@@ -11,7 +11,7 @@ from src.util.file_system_utils import FileSystemUtils
 
 
 class CancerStageDetectionModel:
-    preprocess_before_training = False
+    preprocess_before_training = True
 
     @staticmethod
     def get_input_feature(image):
