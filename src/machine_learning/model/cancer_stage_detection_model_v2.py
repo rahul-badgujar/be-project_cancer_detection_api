@@ -17,6 +17,7 @@ class CancerStageDetectionModelV2:
     def get_input_feature(image_path):
         image = cv2.imread(image_path)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        # image=cv2.resize(image,(200,200))
         if CancerStageDetectionModelV2.preprocess_before_training:
             image = PreprocessingUtils.apply_all_preprocessors(image)
         return image.flatten()
