@@ -9,9 +9,11 @@ from src.util.file_system_utils import FileSystemUtils
 
 
 class SvmModelBase:
-    def __int__(self, model_save_path, preprocess_before_training=True, preprocess_before_prediction=True):
-        self.model_save_path = model_save_path
+    def __init__(self, model_save_path, preprocess_before_training=True, preprocess_before_prediction=True):
         self.model = None
+        self.model_save_path = model_save_path
+        self.preprocess_before_training = preprocess_before_training
+        self.preprocess_before_prediction = preprocess_before_prediction
 
     def get_input_feature(self, image_path):
         raise NotImplemented("Svm Model must implement get_input_feature()")
@@ -48,3 +50,10 @@ class SvmModelBase:
         print(f'Model saved at: {self.model_save_path}')
 
         return result
+
+    def predict(self, img_path):
+        if self.model is None:
+            self.model = joblib.load(self.model_save_path)
+        ip_feature = self.get_input_feature(img_path)
+        prediction = self.model.predict([ip_feature])[0]
+        return AppConstants.cancer_stage_encodings.get(prediction)
