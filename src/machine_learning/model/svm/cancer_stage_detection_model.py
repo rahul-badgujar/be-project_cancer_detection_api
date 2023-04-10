@@ -9,7 +9,7 @@ from src.service.preprocessor.preprocessing_utils import PreprocessingUtils
 
 class CancerStageDetectionModel(SvmModelBase):
     def __init__(self):
-        super().__init__(model_save_path="../../../../model_saved/cancer_stage_detection_model.py",
+        super().__init__(model_save_path="/home/rahul/rahul/be-project/cancer-detection-api/model_saved/cancer_stage_detection_model.pkl",
                          preprocess_before_training=True)
 
     def get_input_feature(self, image_path):
