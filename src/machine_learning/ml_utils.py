@@ -1,4 +1,7 @@
+import base64
+
 import cv2
+import numpy as np
 from skimage import feature
 
 
@@ -30,3 +33,17 @@ def write_np_array_as_image(img_array, out_img_path):
         return out_img_path
     else:
         raise Exception("Failed to save output image")
+
+
+def opencv_img_from_base64(im_base64):
+    im_bytes = base64.b64decode(im_base64)
+    im_arr = np.frombuffer(im_bytes, dtype=np.uint8)
+    img = cv2.imdecode(im_arr, flags=cv2.IMREAD_COLOR)
+    return img
+
+
+def opencv_img_to_base64(img):
+    _, im_arr = cv2.imencode('.jpg', img)
+    im_bytes = im_arr.tobytes()
+    im_base64 = base64.b64encode(im_bytes)
+    return im_base64
