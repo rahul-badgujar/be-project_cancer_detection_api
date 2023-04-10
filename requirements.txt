@@ -8,3 +8,4 @@ imutils~=0.5.4
 svm~=0.1.0
 scikit-learn~=1.2.2
 joblib~=1.2.0
+pandas~=1.4.1
