@@ -53,7 +53,10 @@ class SvmModelBase:
 
     def predict(self, img_path):
         if self.model is None:
-            self.model = joblib.load(self.model_save_path)
+            try:
+                self.model = joblib.load(self.model_save_path)
+            except FileNotFoundError:
+                raise FileNotFoundError(f"Model pickle file not found at {self.model_save_path}. Please generate one.")
         ip_feature = self.get_input_feature(img_path)
         prediction = self.model.predict([ip_feature])[0]
         return AppConstants.cancer_stage_encodings.get(prediction)
