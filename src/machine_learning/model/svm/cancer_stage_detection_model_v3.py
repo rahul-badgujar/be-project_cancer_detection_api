@@ -1,23 +1,20 @@
 import cv2
 import joblib
+import numpy as np
+import pandas as pd
 from imutils import paths
+from skimage.transform import resize
 from sklearn import svm
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import train_test_split
-import pandas as pd
-import os
-from skimage.transform import resize
-from skimage.io import imread
-import numpy as np
-import matplotlib.pyplot as plt
 
 from src.constant.app_constants import AppConstants
 from src.service.preprocessor.preprocessing_utils import PreprocessingUtils
 from src.util.file_system_utils import FileSystemUtils
 
 
-class CancerStageDetectionModelV2:
+class CancerStageDetectionModelV3:
     @staticmethod
     def train():
         RESIZE_DIMENS = (150, 150, 3)
@@ -60,4 +57,4 @@ class CancerStageDetectionModelV2:
 
 
 if __name__ == '__main__':
-    CancerStageDetectionModelV2().train()
+    CancerStageDetectionModelV3().train()
