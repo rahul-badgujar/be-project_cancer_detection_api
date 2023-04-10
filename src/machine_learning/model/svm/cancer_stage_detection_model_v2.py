@@ -1,4 +1,5 @@
 import cv2
+from sklearn import svm
 
 from src.machine_learning.model.svm.svm_model_base import SvmModelBase
 from src.service.preprocessor.preprocessing_utils import PreprocessingUtils
@@ -18,8 +19,14 @@ class CancerStageDetectionModelV2(SvmModelBase):
             image = PreprocessingUtils.apply_all_preprocessors(image)
         return image.flatten()
 
+    def get_model_skeleton(self):
+        c = 1.0
+        kernel = 'linear'
+        return svm.SVC(kernel=kernel, C=c, gamma='scale')
+
 
 if __name__ == '__main__':
     model = CancerStageDetectionModelV2()
-    result = model.predict("/home/rahul/rahul/be-project/cancer-detection-api/data/testing_set/0/1 (1).jpg")
+    # result = model.predict("/home/rahul/rahul/be-project/cancer-detection-api/data/testing_set/0/1 (1).jpg")
+    result = model.train()
     print(result)

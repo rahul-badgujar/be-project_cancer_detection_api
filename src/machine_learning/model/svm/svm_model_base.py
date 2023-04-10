@@ -1,7 +1,6 @@
 import joblib
 import numpy as np
 from imutils import paths
-from sklearn import svm
 from sklearn.metrics import accuracy_score
 
 from src.constant.app_constants import AppConstants
@@ -24,6 +23,9 @@ class SvmModelBase:
         input_features = [self.get_input_feature(img) for img in training_images_paths]
         return np.array(input_features), np.array(labels)
 
+    def get_model_skeleton(self):
+        raise NotImplemented("Svm Model must implement get_model_skeleton()")
+
     def train(self) -> dict:
         x_train, y_train = self.split_data(AppConstants.training_dataset_directory)
         x_test, y_test = self.split_data(AppConstants.testing_dataset_directory)
@@ -35,9 +37,7 @@ class SvmModelBase:
         result['configuration']['training-sample-length'] = len(x_train)
         result['configuration']['testing-sample-length'] = len(x_test)
 
-        c = 1.0
-        kernel = 'linear'
-        model = svm.SVC(kernel=kernel, C=c, gamma='scale')
+        model=self.get_model_skeleton()
 
         model.fit(x_train, y_train)
         predictions = model.predict(x_test)

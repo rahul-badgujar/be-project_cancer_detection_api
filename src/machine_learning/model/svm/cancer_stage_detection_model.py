@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from sklearn import svm
 
 from src.machine_learning.ml_utils import quantify_image, fd_hu_moments
 from src.machine_learning.model.svm.svm_model_base import SvmModelBase
@@ -21,8 +22,14 @@ class CancerStageDetectionModel(SvmModelBase):
         ft2 = fd_hu_moments(image)
         return np.hstack([ft1, ft2])
 
+    def get_model_skeleton(self):
+        c = 1.0
+        kernel = 'linear'
+        return svm.SVC(kernel=kernel, C=c, gamma='scale')
+
 
 if __name__ == '__main__':
     model = CancerStageDetectionModel()
-    result = model.predict("/home/rahul/rahul/be-project/cancer-detection-api/data/testing_set/0/1 (1).jpg")
+    # result = model.predict("/home/rahul/rahul/be-project/cancer-detection-api/data/testing_set/0/1 (1).jpg")
+    result=model.train()
     print(result)
