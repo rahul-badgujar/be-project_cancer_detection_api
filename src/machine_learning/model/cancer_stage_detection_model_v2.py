@@ -4,14 +4,16 @@ from sklearn import svm
 from imutils import paths
 from sklearn.metrics import accuracy_score
 
+import joblib
+
 from src.constant.app_constants import AppConstants
-from src.machine_learning.ml_utils import quantify_image, fd_hu_moments
 from src.service.preprocessor.preprocessing_utils import PreprocessingUtils
 from src.util.file_system_utils import FileSystemUtils
 
 
 class CancerStageDetectionModelV2:
     preprocess_before_training = True
+    model_save_path = "../../../model_saved/cancer_stage_detection_model_v2.py"
 
     @staticmethod
     def get_input_feature(image_path):
@@ -48,8 +50,12 @@ class CancerStageDetectionModelV2:
         model.fit(x_train, y_train)
         predictions = model.predict(x_test)
         accuracy = accuracy_score(predictions, y_test) * 100
+        print(f"Model trained with accuracy: {accuracy}")
 
         result['output']['accuracy'] = accuracy
+
+        joblib.dump(model, CancerStageDetectionModelV2.model_save_path)
+        print(f'Model saved at: {CancerStageDetectionModelV2.model_save_path}')
 
         return result
 
