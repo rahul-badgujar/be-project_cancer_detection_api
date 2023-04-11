@@ -47,3 +47,13 @@ def opencv_img_to_base64(img):
     im_bytes = im_arr.tobytes()
     im_base64 = base64.b64encode(im_bytes)
     return im_base64
+
+
+def calculate_metrics_from_3x3_confusion_matrix(cm):
+    tp = cm[0][0] + cm[1][1] + cm[2][2]
+    tn = (cm[1][1] + cm[1][2] + cm[2][1] + cm[2][2]) + (cm[0][0] + cm[0][2] + cm[2][0] + cm[2][2]) + (
+                cm[0][0] + cm[0][1] + cm[1][0] + cm[1][1])
+    fp = (cm[1][0] + cm[2][0]) + (cm[0][1] + cm[2][1]) + (cm[0][2] + cm[1][2])
+    fn = (cm[0][1] + cm[0][2]) + (cm[1][0] + cm[1][2]) + (cm[2][0] + cm[2][1])
+
+    return int(tp), int(tn), int(fp), int(fn)

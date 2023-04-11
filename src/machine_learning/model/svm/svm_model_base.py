@@ -3,9 +3,10 @@ import time
 import joblib
 import numpy as np
 from imutils import paths
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, confusion_matrix
 
 from src.constant.app_constants import AppConstants
+from src.machine_learning.ml_utils import calculate_metrics_from_3x3_confusion_matrix
 from src.machine_learning.model.svm_model_training_config import SvmModelTrainingConfig
 from src.util.file_system_utils import FileSystemUtils
 
@@ -47,11 +48,19 @@ class SvmModelBase:
         x_test, y_test = self.split_data(AppConstants.testing_dataset_directory, training_config)
         result['internal_training_specifications']['testing_sample_length'] = len(x_test)
 
-        predictions = model.predict(x_test)
-        accuracy = accuracy_score(predictions, y_test) * 100
+        y_pred = model.predict(x_test)
+        accuracy = accuracy_score(y_test, y_pred) * 100
         print(f"Model trained with accuracy: {accuracy}")
-
         result['output']['accuracy'] = accuracy
+
+        conf_matrix_result = dict()
+        cm = confusion_matrix(y_test, y_pred)
+        tp, tn, fp, fn = calculate_metrics_from_3x3_confusion_matrix(cm)
+        conf_matrix_result['true_negative'] = tn
+        conf_matrix_result['false_positive'] = fp
+        conf_matrix_result['false_negative'] = fn
+        conf_matrix_result['true_positive'] = tp
+        result['output']['confusion_matrix'] = conf_matrix_result
 
         # saving model if applicable
         if training_config.update_stored_model:
