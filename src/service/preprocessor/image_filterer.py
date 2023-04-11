@@ -2,8 +2,6 @@ import cv2
 
 from src.enum.preprocessing_stage import PreprocessingStage
 from src.service.preprocessor.preprocessor_base import Preprocessor
-from PIL import Image, ImageFilter
-import numpy as np
 
 
 class ImageFilterer(Preprocessor):
