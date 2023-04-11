@@ -1,4 +1,5 @@
 import base64
+import json
 import time
 
 import cv2
@@ -11,7 +12,9 @@ from src.enum.preprocessing_stage import PreprocessingStage
 from src.machine_learning.ml_utils import opencv_img_from_base64, opencv_img_to_base64
 from src.machine_learning.model.svm.cancer_stage_detection_model import CancerStageDetectionModel
 from src.machine_learning.model.svm.cancer_stage_detection_model_v2 import CancerStageDetectionModelV2
+from src.machine_learning.model.svm_model_training_config import SvmModelTrainingConfig
 from src.service.preprocessor.preprocessing_utils import PreprocessingUtils
+from src.util.common_utils import parse_bool
 from src.util.file_system_utils import FileSystemUtils
 
 app = Flask(__name__)
@@ -26,8 +29,8 @@ cancer_stage_detection_model_version_wise_predictor = {
     "v2": lambda img_path: cancer_stage_detection_model_v2.predict(img_path),
 }
 cancer_stage_detection_model_version_wise_trainer = {
-    "v1": lambda: cancer_stage_detection_model.train(),
-    "v2": lambda: cancer_stage_detection_model_v2.train(),
+    "v1": lambda training_config: cancer_stage_detection_model.train(training_config),
+    "v2": lambda training_config: cancer_stage_detection_model_v2.train(training_config),
 }
 
 
@@ -36,11 +39,18 @@ def hello_world():
     return 'Hello, World!'
 
 
-@app.route('/api/models/cancer_detection_model/<version>/train', methods=['GET'])
+@app.route('/api/models/cancer_detection_model/<version>/train', methods=['POST'])
 def preprocess_image(version):
     assert version == request.view_args['version']
     assert version in ('v1', 'v2'), "Invalid Model Version"
-    training_result = cancer_stage_detection_model_version_wise_trainer[version]()
+    request_body = request.json
+    training_config = SvmModelTrainingConfig(
+        pretraining_preprocessing_enabled=parse_bool(request_body.get("pretraining_preprocessing_enabled"),
+                                                     default_to=True),
+        update_stored_model=parse_bool(request_body.get("update_stored_model"),
+                                       default_to=False))
+    training_result = cancer_stage_detection_model_version_wise_trainer[version](training_config)
+    training_result['input_training_configuration'] = request_body
     return training_result
 
 
