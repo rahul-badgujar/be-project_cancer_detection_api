@@ -57,6 +57,6 @@ class SvmModelBase:
                 self.model = joblib.load(self.model_save_path)
             except FileNotFoundError:
                 raise FileNotFoundError(f"Model pickle file not found at {self.model_save_path}. Please generate one.")
-        ip_feature = self.get_input_feature(img_path)
+        ip_feature = self.get_input_feature(img_path, SvmModelTrainingConfig(pretraining_preprocessing_enabled=True))
         prediction = self.model.predict([ip_feature])[0]
         return AppConstants.cancer_stage_encodings.get(prediction)
