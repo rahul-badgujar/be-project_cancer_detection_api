@@ -1,3 +1,5 @@
+import time
+
 import joblib
 import numpy as np
 from imutils import paths
@@ -26,25 +28,32 @@ class SvmModelBase:
         raise NotImplemented("Svm Model must implement get_model_skeleton()")
 
     def train(self, training_config: SvmModelTrainingConfig) -> dict:
-        x_train, y_train = self.split_data(AppConstants.training_dataset_directory, training_config)
-        x_test, y_test = self.split_data(AppConstants.testing_dataset_directory, training_config)
-
         result = dict()
         result['internal_training_specifications'] = dict()
         result['output'] = dict()
 
+        # model training
+        x_train, y_train = self.split_data(AppConstants.training_dataset_directory, training_config)
         result['internal_training_specifications']['training_sample_length'] = len(x_train)
-        result['internal_training_specifications']['testing_sample_length'] = len(x_test)
 
         model = self.get_model_skeleton()
 
+        training_start_time = time.time_ns()
         model.fit(x_train, y_train)
+        training_end_time = time.time_ns()
+        result['output']['training_time'] = f'{training_end_time - training_start_time} ns'
+
+        # model evaluation
+        x_test, y_test = self.split_data(AppConstants.testing_dataset_directory, training_config)
+        result['internal_training_specifications']['testing_sample_length'] = len(x_test)
+
         predictions = model.predict(x_test)
         accuracy = accuracy_score(predictions, y_test) * 100
         print(f"Model trained with accuracy: {accuracy}")
 
         result['output']['accuracy'] = accuracy
 
+        # saving model if applicable
         if training_config.update_stored_model:
             joblib.dump(model, self.model_save_path)
             print(f'Model saved at: {self.model_save_path}')
