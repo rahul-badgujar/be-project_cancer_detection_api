@@ -5,3 +5,5 @@ temp/intermediate/*
 __pycache__/
 *.py[cod]
 *$py.class
+
+*/model_saved/severity_prediction_model.pkl

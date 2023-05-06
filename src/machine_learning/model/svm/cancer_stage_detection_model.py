@@ -8,7 +8,7 @@ from src.machine_learning.model.svm_model_training_config import SvmModelTrainin
 from src.service.preprocessor.preprocessing_utils import PreprocessingUtils
 
 
-class CancerStageDetectionModel(SvmModelBase):
+class CancerClassificationModel(SvmModelBase):
     def __init__(self):
         super().__init__(
             model_save_path="/home/rahul/rahul/be-project/cancer-detection-api/model_saved/cancer_stage_detection_model.pkl")
@@ -30,7 +30,7 @@ class CancerStageDetectionModel(SvmModelBase):
 
 
 if __name__ == '__main__':
-    model = CancerStageDetectionModel()
+    model = CancerClassificationModel()
     # result = model.predict("/home/rahul/rahul/be-project/cancer-detection-api/data/testing_set/0/1 (1).jpg")
     result = model.train()
     print(result)

@@ -10,7 +10,8 @@ from flask_cors import CORS, cross_origin
 from src.constant.app_constants import AppConstants
 from src.enum.preprocessing_stage import PreprocessingStage
 from src.machine_learning.ml_utils import opencv_img_from_base64, opencv_img_to_base64
-from src.machine_learning.model.svm.cancer_stage_detection_model import CancerStageDetectionModel
+from src.machine_learning.model.regressor.severity_prediction_model import SeverityPredictionModel
+from src.machine_learning.model.svm.cancer_stage_detection_model import CancerClassificationModel
 from src.machine_learning.model.svm.cancer_stage_detection_model_v2 import CancerStageDetectionModelV2
 from src.machine_learning.model.svm_model_training_config import SvmModelTrainingConfig
 from src.service.preprocessor.preprocessing_utils import PreprocessingUtils
@@ -22,16 +23,8 @@ cors = CORS(app)
 
 app.config['UPLOAD_FOLDER'] = AppConstants.temp_file_upload_directory
 
-cancer_stage_detection_model = CancerStageDetectionModel()
-cancer_stage_detection_model_v2 = CancerStageDetectionModelV2()
-cancer_stage_detection_model_version_wise_predictor = {
-    "v1": lambda img_path: cancer_stage_detection_model.predict(img_path),
-    "v2": lambda img_path: cancer_stage_detection_model_v2.predict(img_path),
-}
-cancer_stage_detection_model_version_wise_trainer = {
-    "v1": lambda training_config: cancer_stage_detection_model.train(training_config),
-    "v2": lambda training_config: cancer_stage_detection_model_v2.train(training_config),
-}
+cancer_classification_model = CancerClassificationModel()
+severity_predictor_model = SeverityPredictionModel()
 
 
 @app.route('/hello', methods=['GET'])
@@ -39,27 +32,28 @@ def hello_world():
     return 'Hello, World!'
 
 
-@app.route('/api/models/cancer_detection_model/<version>/train', methods=['POST'])
-def preprocess_image(version):
-    assert version == request.view_args['version']
-    assert version in ('v1', 'v2'), "Invalid Model Version"
+@app.route('/api/models/cancer_detection_model/train', methods=['POST'])
+def train_classification_model():
     request_body = request.json
     training_config = SvmModelTrainingConfig(
         pretraining_preprocessing_enabled=parse_bool(request_body.get("pretraining_preprocessing_enabled"),
                                                      default_to=True),
         update_stored_model=parse_bool(request_body.get("update_stored_model"),
                                        default_to=False))
-    training_result = cancer_stage_detection_model_version_wise_trainer[version](training_config)
+    training_result = cancer_classification_model.train(training_config)
     training_result['input_training_configuration'] = request_body
     return training_result
 
 
-@app.route('/api/models/cancer_detection_model/<version>/predict', methods=['POST'])
-@cross_origin()
-def predict_cancer_stage(version):
-    assert version == request.view_args['version']
-    assert version in ('v1', 'v2'), "Invalid Model Version"
+@app.route('/api/models/severity_prediction_model/train', methods=['POST'])
+def train_severity_prediction_model():
+    severity_predictor_model.train()
+    return {'result': 'success'}
 
+
+@app.route('/api/core/predict', methods=['POST'])
+@cross_origin()
+def predict_cancer_stage():
     ip_img_base64 = request.form.get("image_base64")
     assert ip_img_base64 is not None, "No input image provided"
 
@@ -83,8 +77,9 @@ def predict_cancer_stage(version):
     response_body['preprocessing_output'][PreprocessingStage.segmentation.name] = opencv_img_to_base64(
         segmented_arr).decode()
     # prediction
-    predicted_stage = cancer_stage_detection_model_version_wise_predictor[version](temp_file_path)
+    predicted_stage = cancer_classification_model.predict(temp_file_path)
     response_body['predicted_stage'] = predicted_stage
+    response_body['predicated_scale'] = severity_predictor_model.predict(temp_file_path)
     return response_body
 
 
