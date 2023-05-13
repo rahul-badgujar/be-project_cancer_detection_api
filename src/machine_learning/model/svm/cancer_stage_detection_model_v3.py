@@ -19,7 +19,7 @@ class CancerStageDetectionModelV3:
     def train(preprocess=True):
         resize_dimension = (160, 160)
 
-        training_images_paths = list(paths.list_images(AppConstants.training_dataset_directory))
+        training_images_paths = list(paths.list_images(FileSystemUtils.get_training_dataset_directory()))
         labels = [img_path.split(FileSystemUtils.get_os_path_separator())[-2] for img_path in training_images_paths]
         input_features = []
         for img in training_images_paths:

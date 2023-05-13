@@ -21,7 +21,7 @@ from src.util.file_system_utils import FileSystemUtils
 app = Flask(__name__)
 cors = CORS(app)
 
-app.config['UPLOAD_FOLDER'] = AppConstants.temp_file_upload_directory
+app.config['UPLOAD_FOLDER'] = FileSystemUtils.get_temp_file_upload_directory()
 
 cancer_classification_model = CancerClassificationModel()
 severity_predictor_model = SeverityPredictionModel()
@@ -34,14 +34,13 @@ def hello_world():
 
 @app.route('/api/models/cancer_detection_model/train', methods=['POST'])
 def train_classification_model():
-    request_body = request.json
     training_config = SvmModelTrainingConfig(
-        pretraining_preprocessing_enabled=parse_bool(request_body.get("pretraining_preprocessing_enabled"),
+        pretraining_preprocessing_enabled=parse_bool(request.form.get("pretraining_preprocessing_enabled"),
                                                      default_to=True),
-        update_stored_model=parse_bool(request_body.get("update_stored_model"),
+        update_stored_model=parse_bool(request.form.get("update_stored_model"),
                                        default_to=False))
     training_result = cancer_classification_model.train(training_config)
-    training_result['input_training_configuration'] = request_body
+    training_result['input_training_configuration'] = request.form
     return training_result
 
 
@@ -79,7 +78,12 @@ def predict_cancer_stage():
     # prediction
     predicted_stage = cancer_classification_model.predict(temp_file_path)
     response_body['predicted_stage'] = predicted_stage
-    response_body['predicated_scale'] = severity_predictor_model.predict(temp_file_path)
+    response_body['predicted_scale'] = severity_predictor_model.predict(temp_file_path)
+    response_body['scale_pointers']={
+        'normal':3,
+        'benign':5,
+        'malignant':8
+    }
     return response_body
 
 

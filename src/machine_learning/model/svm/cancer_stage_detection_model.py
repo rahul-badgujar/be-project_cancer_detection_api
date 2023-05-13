@@ -6,12 +6,15 @@ from src.machine_learning.ml_utils import quantify_image, fd_hu_moments
 from src.machine_learning.model.svm.svm_model_base import SvmModelBase
 from src.machine_learning.model.svm_model_training_config import SvmModelTrainingConfig
 from src.service.preprocessor.preprocessing_utils import PreprocessingUtils
+from src.util.file_system_utils import FileSystemUtils
 
 
 class CancerClassificationModel(SvmModelBase):
     def __init__(self):
         super().__init__(
-            model_save_path="/home/rahul/rahul/be-project/cancer-detection-api/model_saved/cancer_stage_detection_model.pkl")
+            model_save_path=FileSystemUtils.join_all(
+                [FileSystemUtils.get_model_save_path(), 'cancer_stage_detection_model.pkl'])
+        )
 
     def get_input_feature(self, image_path, training_config: SvmModelTrainingConfig):
         image = cv2.imread(image_path)
@@ -31,6 +34,5 @@ class CancerClassificationModel(SvmModelBase):
 
 if __name__ == '__main__':
     model = CancerClassificationModel()
-    # result = model.predict("/home/rahul/rahul/be-project/cancer-detection-api/data/testing_set/0/1 (1).jpg")
     result = model.train()
     print(result)

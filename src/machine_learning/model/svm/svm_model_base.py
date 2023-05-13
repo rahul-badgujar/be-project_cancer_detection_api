@@ -34,7 +34,7 @@ class SvmModelBase:
         result['output'] = dict()
 
         # model training
-        x_train, y_train = self.split_data(AppConstants.training_dataset_directory, training_config)
+        x_train, y_train = self.split_data(FileSystemUtils.get_training_dataset_directory(), training_config)
         result['internal_training_specifications']['training_sample_length'] = len(x_train)
 
         model = self.get_model_skeleton()
@@ -45,7 +45,7 @@ class SvmModelBase:
         result['output']['training_time'] = f'{training_end_time - training_start_time} ns'
 
         # model evaluation
-        x_test, y_test = self.split_data(AppConstants.testing_dataset_directory, training_config)
+        x_test, y_test = self.split_data(FileSystemUtils.get_testing_dataset_directory(), training_config)
         result['internal_training_specifications']['testing_sample_length'] = len(x_test)
 
         y_pred = model.predict(x_test)

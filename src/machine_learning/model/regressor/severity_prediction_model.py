@@ -3,9 +3,6 @@ import joblib
 from imutils import paths
 import numpy as np
 from sklearn.svm import SVR
-
-from src.constant.app_constants import AppConstants
-from src.machine_learning.model.svm_model_training_config import SvmModelTrainingConfig
 from src.util.file_system_utils import FileSystemUtils
 from src.machine_learning.ml_utils import quantify_image, fd_hu_moments
 
@@ -16,7 +13,8 @@ class SeverityPredictionModel:
         self.label_to_proposed_severity_value = {
             '0': 5, '1': 10, '2': 1
         }
-        self.model_save_path = '/home/rahul/rahul/be-project/cancer-detection-api/model_saved/severity_prediction_model.pkl'
+        self.model_save_path = FileSystemUtils.join_all(
+            [FileSystemUtils.get_model_save_path(), 'severity_prediction_model.pkl'])
         self.model = None
 
     def extract_feature(self, image_path):
@@ -35,7 +33,7 @@ class SeverityPredictionModel:
         return np.array(input_features), np.array(labels)
 
     def train(self):
-        x_train, y_train = self.split_data(AppConstants.training_dataset_directory)
+        x_train, y_train = self.split_data(FileSystemUtils.get_training_dataset_directory())
         model = SVR()
         model.fit(x_train, y_train)
         joblib.dump(model, self.model_save_path)
